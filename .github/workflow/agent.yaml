@@ -1,0 +1,33 @@
+name: Local AI Agent Test
+
+on:
+  issues:
+    types: [opened] # Issueが作られたら起動
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  test-job:
+    runs-on: self-hosted # 💡 あなたのPCを指名
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # テストとして、適当なテキストファイルを1つ書き換えてみる
+      - name: Make a small change
+        run: |
+          echo "AIがこの行を追加しました" >> ai_test.txt
+
+      # 自動でブランチを切ってPRを作成
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ai/issue-${{ github.event.issue.number }}
+          commit-message: "auto: AI test change"
+          title: "AI Test PR for Issue #${{ github.event.issue.number }}"
+          body: "あなたのPCのセルフホステッドランナーが裏で動いて作成したPRです！"
+          base: main
